@@ -11,8 +11,11 @@
   1、lio to mavros：该节点是将Fast-LIO里程计信息转换到PX4机体坐标系下
   2、uart_node:该节点是下位机与上位机通过串口进行传输
   3、offboard_node:该节点是无人机控制指令节点
+  4、run_all.sh:该脚本可以打开所有代码 包括LIO、通信和控制节点，使用前将其赋予chmod +x 权限并设置开机启动
 经验证可以顺利完成2024年电赛题目 100/120；
 
 优化方向：offboard_node在标志位代码编写冗余可以使用单个子函数进行替换
 
 后续更新：机架3D打印件；底层STM32代码；openmv数据集以及代码；CUAV PX4参数文件
+
+演示视频：【CUAV V5nano 融合Fast-LIO 自主无人机定位与航点测试飞行-哔哩哔哩】 https://b23.tv/Q0KBtWE
