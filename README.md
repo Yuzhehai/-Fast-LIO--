@@ -19,9 +19,8 @@
   3、offboard_node:该节点是无人机控制指令节点
   4、run_all.sh:该脚本可以打开所有代码 包括LIO、通信和控制节点，使用前将其赋予chmod +x 权限并设置开机启动
 经验证可以顺利完成2024年电赛题目 100/120；
-
 3D maker文件里包含无人机适配的打印文件可以根据实际需求进行更改
 
-感谢 UEM Arklab Yusiyuan；UEM storm Lixiaojia；UEM strom ZhouZhenQuan 对项目的支持与开发；
-祝师弟师妹们勇闯佳绩
+感谢 UEM Arklab Yusiyuan；UEM storm Lixiaojia；UEM strom ZhouZhenQuan 对项目的支持与开发；祝师弟师妹们勇创佳绩！
+
 演示视频：【CUAV V5nano 融合Fast-LIO 自主无人机定位与航点测试飞行-哔哩哔哩】 https://b23.tv/Q0KBtWE
