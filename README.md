@@ -6,6 +6,10 @@
   4、视觉模块openmv4 plus
   5、330轴距全碳板机架
 
+图片
+  ![51c031161437cb36e15dbde849eb0f08](https://github.com/user-attachments/assets/b4e4fbb1-d6cc-46fa-8001-700f310332dc)
+
+
 创建工作空间将src文件夹clone进去，使用catkin_make进行编译
 在src文件夹下包含3个node节点
   1、lio to mavros：该节点是将Fast-LIO里程计信息转换到PX4机体坐标系下
