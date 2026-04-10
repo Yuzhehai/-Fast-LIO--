@@ -18,6 +18,6 @@
 经验证可以顺利完成2024年电赛题目 100/120；
 3D maker文件里包含无人机适配的打印文件可以根据实际需求进行更改
 
-感谢 UEM Arklab Yusiyuan；UEM storm Lixiaojia；UEM strom ZhouZhenQuan 对项目的支持与开发；祝师弟师妹们勇创佳绩！
+感谢 UEM Arklab Yusiyuan；UEM storm Lixiaojia；UEM strom ZhouZhenQuan；UEM strom The captain of Tomato 对项目的支持与开发；祝师弟师妹们勇创佳绩！
 
 演示视频：【CUAV V5nano 融合Fast-LIO 自主无人机定位与航点测试飞行-哔哩哔哩】 https://b23.tv/Q0KBtWE
