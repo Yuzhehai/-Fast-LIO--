@@ -7,10 +7,7 @@
   5、330轴距全碳板机架
 
 图片
-  ![15509af96827bb32bd603fee05b0be65](https://github.com/user-attachments/assets/63f2d7bf-666a-4e45-9222-9eef1bcdb0ca)
-
   ![51c031161437cb36e15dbde849eb0f08](https://github.com/user-attachments/assets/b4e4fbb1-d6cc-46fa-8001-700f310332dc)
-
 
 创建工作空间将src文件夹clone进去，使用catkin_make进行编译
 在src文件夹下包含3个node节点
