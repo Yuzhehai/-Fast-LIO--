@@ -7,6 +7,8 @@
   5、330轴距全碳板机架
 
 图片
+  ![15509af96827bb32bd603fee05b0be65](https://github.com/user-attachments/assets/63f2d7bf-666a-4e45-9222-9eef1bcdb0ca)
+
   ![51c031161437cb36e15dbde849eb0f08](https://github.com/user-attachments/assets/b4e4fbb1-d6cc-46fa-8001-700f310332dc)
 
 
@@ -20,4 +22,6 @@
 
 3D maker文件里包含无人机适配的打印文件可以根据实际需求进行更改
 
+感谢 UEM Arklab Yusiyuan；UEM storm Lixiaojia；UEM strom ZhouZhenQuan 对项目的支持与开发；
+祝师弟师妹们勇闯佳绩
 演示视频：【CUAV V5nano 融合Fast-LIO 自主无人机定位与航点测试飞行-哔哩哔哩】 https://b23.tv/Q0KBtWE
