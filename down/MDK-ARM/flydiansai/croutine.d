@@ -1,0 +1,14 @@
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/croutine.c
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+flydiansai\croutine.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stddef.h
+flydiansai\croutine.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdint.h
+flydiansai\croutine.o: ../Core/Inc/FreeRTOSConfig.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/croutine.h
+flydiansai\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

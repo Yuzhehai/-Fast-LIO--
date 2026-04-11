@@ -1,0 +1,15 @@
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
+flydiansai\event_groups.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdlib.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+flydiansai\event_groups.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stddef.h
+flydiansai\event_groups.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdint.h
+flydiansai\event_groups.o: ../Core/Inc/FreeRTOSConfig.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+flydiansai\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h

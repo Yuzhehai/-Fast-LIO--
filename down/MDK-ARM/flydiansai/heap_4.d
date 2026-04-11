@@ -1,0 +1,13 @@
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
+flydiansai\heap_4.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdlib.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+flydiansai\heap_4.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stddef.h
+flydiansai\heap_4.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdint.h
+flydiansai\heap_4.o: ../Core/Inc/FreeRTOSConfig.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+flydiansai\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

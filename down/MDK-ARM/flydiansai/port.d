@@ -1,0 +1,12 @@
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/port.c
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+flydiansai\port.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stddef.h
+flydiansai\port.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdint.h
+flydiansai\port.o: ../Core/Inc/FreeRTOSConfig.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+flydiansai\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

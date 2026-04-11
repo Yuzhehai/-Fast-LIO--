@@ -1,0 +1,11 @@
+{
+  "files.associations": {
+    "myusart.h": "c",
+    "struct_typedef.h": "c",
+    "anjian.h": "c",
+    "main.h": "c",
+    "lcd_task.h": "c",
+    "send_task.h": "c",
+    "cmsis_os.h": "c"
+  }
+}

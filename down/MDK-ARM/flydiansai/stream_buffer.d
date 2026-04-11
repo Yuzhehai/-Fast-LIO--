@@ -1,0 +1,14 @@
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c
+flydiansai\stream_buffer.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdint.h
+flydiansai\stream_buffer.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\string.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+flydiansai\stream_buffer.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stddef.h
+flydiansai\stream_buffer.o: ../Core/Inc/FreeRTOSConfig.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+flydiansai\stream_buffer.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/stream_buffer.h

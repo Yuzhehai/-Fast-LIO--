@@ -1,0 +1,16 @@
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c
+flydiansai\tasks.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdlib.h
+flydiansai\tasks.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\string.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+flydiansai\tasks.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stddef.h
+flydiansai\tasks.o: D:\MDK5.36\ARM\ARMCC\Bin\..\include\stdint.h
+flydiansai\tasks.o: ../Core/Inc/FreeRTOSConfig.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+flydiansai\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/stack_macros.h
