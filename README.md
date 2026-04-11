@@ -1,4 +1,5 @@
 首先进行Fast-LIO项目建立并确保可以输出正确的topic
+Fastlio github仓库：https://github.com/hku-mars/FAST_LIO
 无人机硬件：
   1、2207 6inch电机
   2、4s 9000mah电池
