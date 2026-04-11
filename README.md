@@ -1,7 +1,6 @@
-首先进行Fast-LIO项目建立并确保可以输出正确的topicFastlio
+首先进行Fast-LIO项目建立并确保可以输出正确的topic
 
-
-github仓库：https://github.com/hku-mars/FAST_LIO
+Fastlio:github仓库：https://github.com/hku-mars/FAST_LIO
 
 
 无人机硬件：
