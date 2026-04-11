@@ -17,6 +17,7 @@
   4、run_all.sh:该脚本可以打开所有代码 包括LIO、通信和控制节点，使用前将其赋予chmod +x 权限并设置开机启动
 经验证可以顺利完成2024年电赛题目 100/120；
 3D maker文件里包含无人机适配的打印文件可以根据实际需求进行更改
+down文件夹与uper文件夹包含下位机配置信息与源代码，可以实现按键与液晶屏计算航线然后发布到上位机进行执行
 
 感谢 UEM Arklab Yusiyuan；UEM storm Lixiaojia；UEM strom ZhouZhenQuan；UEM strom The captain of Tomato 对项目的支持与开发；祝师弟师妹们勇创佳绩！
 
