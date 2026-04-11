@@ -83,9 +83,76 @@ void local_pos_cb(const nav_msgs::Odometry::ConstPtr& msg)
     //四元数转为欧拉角，后续程序使用
     tf::quaternionMsgToTF(local_pos.pose.pose.orientation, quat);   
     tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
-
-
 }
+
+// 新增函数：根据flag值设置目标位置
+void setTargetPosition(int flag_val, geometry_msgs::PoseStamped& pose, 
+                      float init_x, float init_y, float init_z)
+{
+    // 特殊flag值处理
+    if (flag_val == 91)
+    {
+        pose.pose.position.x = init_x;
+        pose.pose.position.y = init_y;
+        pose.pose.position.z = init_z + 0.3;
+        return;
+    }
+    
+    // 普通flag值处理：解析十位和个位
+    if (flag_val >= 0 && flag_val <= 99)
+    {
+        int row = flag_val / 10;  // 十位数
+        int col = flag_val % 10;  // 个位数
+        
+        // 根据行和列计算目标位置
+        // 行号对应Y轴偏移：0->0, 1->0.5, 2->1.0, ..., 6->3.5, 7->4.0
+        // 列号对应X轴偏移：0->0, 1->0.5, 2->1.0, ..., 6->3.5, 7->4.0
+        
+        // 特殊处理：某些位置有固定偏移
+        float x_offset = 0.0;
+        float y_offset = 0.0;
+        
+        // 计算X轴偏移
+        if (col == 0) x_offset = 0.0;
+        else if (col == 1) x_offset = 0.5;
+        else if (col == 2) x_offset = 1.0;
+        else if (col == 3) x_offset = 1.5;
+        else if (col == 4) x_offset = 2.0;
+        else if (col == 5) x_offset = 2.5;
+        else if (col == 6) x_offset = 3.0;
+        else if (col == 7) x_offset = 3.5;
+        else if (col == 8) x_offset = 4.0;
+        
+        // 计算Y轴偏移
+        if (row == 0) y_offset = 0.0;
+        else if (row == 1) y_offset = 0.5;
+        else if (row == 2) y_offset = 1.0;
+        else if (row == 3) y_offset = 1.5;
+        else if (row == 4) y_offset = 2.0;
+        else if (row == 5) y_offset = 2.5;
+        else if (row == 6) y_offset = 3.0;
+        else if (row == 7) y_offset = 3.5;
+        else if (row == 8) y_offset = 4.0;
+        
+        // 特殊处理某些位置
+        if (flag_val == 5) x_offset = 1.0;  // 特殊位置
+        if (flag_val == 3) x_offset = 1.0;  // 特殊位置
+        if (flag_val == 2) x_offset = 1.0;  // 特殊位置
+        if (flag_val == 1) x_offset = 1.0;  // 特殊位置
+        if (flag_val == 0) x_offset = 1.0;  // 特殊位置
+        if (flag_val == 52) y_offset = 1.0;  // 特殊位置
+        if (flag_val == 42) y_offset = 1.0;  // 特殊位置
+        if (flag_val == 32) y_offset = 1.0;  // 特殊位置
+        if (flag_val == 22) y_offset = 1.0;  // 特殊位置
+        if (flag_val == 12) y_offset = 1.0;  // 特殊位置
+        
+        // 设置目标位置
+        pose.pose.position.x = init_x + x_offset;
+        pose.pose.position.y = init_y + y_offset;
+        pose.pose.position.z = init_z + ALTITUDE;
+    }
+}
+
 int main(int argc, char **argv)
 {
     //初始化节点，ROSAPI接口
@@ -136,601 +203,105 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-        while(ros::ok() && flag != 99)
+    while(ros::ok() && flag != 99)
     {   
         ROS_INFO("Waiting for start command (flag=99)...");
         ros::spinOnce();
         rate.sleep();
     }
         
-        //模式切换变量定义
-        mavros_msgs::SetMode offb_set_mode;
-        offb_set_mode.request.custom_mode = "OFFBOARD";
+    //模式切换变量定义
+    mavros_msgs::SetMode offb_set_mode;
+    offb_set_mode.request.custom_mode = "OFFBOARD";
     
     //解锁变量定义
-        mavros_msgs::CommandBool arm_cmd;
-        arm_cmd.request.value = true;
+    mavros_msgs::CommandBool arm_cmd;
+    arm_cmd.request.value = true;
 
     //获取系统当前时间给变量last_request
-        ros::Time start_time  = ros::Time::now();
+    ros::Time start_time  = ros::Time::now();
     
     while(ros::ok())
-            {
-                //请求进入OFFBOARD模式，每隔5秒请求一次
-                if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)))
-                {
-                    if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
-                    {
-                        ROS_INFO("Offboard enabled");
-                    }
-                    last_request = ros::Time::now();
-                    start_time = ros::Time::now();
-                    flag_init_position = false;         
-                }
-                else 
-                {
-                    //请求解锁，每隔5秒请求一次
-                    if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
-                    {
-                        if( arming_client.call(arm_cmd) && arm_cmd.response.success)
-                        {
-                            ROS_INFO("Vehicle armed");
-                        }
-                        last_request = ros::Time::now();
-                        start_time = ros::Time::now();
-                        flag_init_position = false;         
-                    }
-                }
-                
-                //2、添加时间判断，使得无人机跳出模式切换循环
-                if(ros::Time::now() - last_request > ros::Duration(8.0))
-                {
-                    break;
-                    flag = 68;
-                }
-                    
-                //发布期望位置信息
-                pose.pose.position.x =init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                local_pos_pub.publish(pose);
-                ros::spinOnce();
-                rate.sleep();
-            }       
-            last_request = ros::Time::now();        
-
-        while(ros::ok())
+    {
+        //请求进入OFFBOARD模式，每隔5秒请求一次
+        if( current_state.mode != "OFFBOARD" && (ros::Time::now() - last_request > ros::Duration(5.0)))
         {
-
-            ROS_INFO("target_X: %f target_Y: %f",pose.pose.position.x,pose.pose.position.y);
-            local_pos_pub.publish(pose);
-            ros::spinOnce();
-            rate.sleep();
-            ROS_WARN("%d",flag);
-
-            if(flag == 68 && ros::Time::now() - last_request > ros::Duration(1.0))
+            if( set_mode_client.call(offb_set_mode) && offb_set_mode.response.mode_sent)
             {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
+                ROS_INFO("Offboard enabled");
             }
-
-            if(flag == 67 && ros::Time::now() - last_request > ros::Duration(1.0))
+            last_request = ros::Time::now();
+            start_time = ros::Time::now();
+            flag_init_position = false;         
+        }
+        else 
+        {
+            //请求解锁，每隔5秒请求一次
+            if( !current_state.armed && (ros::Time::now() - last_request > ros::Duration(5.0)))
             {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 66 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 65 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if(flag == 64 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 63 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 62 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 3;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 61 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 60 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 4;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 58 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 48 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 38 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 28 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 18 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 8 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 3;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if(flag == 57 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 47 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 37 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 27 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if(flag == 17 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 7 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 3;
-                pose.pose.position.y =init_position_y_take_off + 0.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 56 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if(flag == 46 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 36 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if(flag == 26 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if(flag == 16 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 6 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 3;
-                pose.pose.position.y =init_position_y_take_off + 1;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 55 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 45 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 35 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 25 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.0;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if (flag == 15 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if (flag == 5 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 1.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 54 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 44 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 34 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }   
-
-            if (flag == 24 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 14 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 4 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 3;
-                pose.pose.position.y =init_position_y_take_off + 2;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 53 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 43 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 33 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 23 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.0;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 13 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 3 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 2.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 52 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 1.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 42 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 1.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 32 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 1.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 22 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.0;
-                pose.pose.position.y =init_position_y_take_off + 1.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 12 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 1.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 2 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 1.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 51 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 41 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 31 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if (flag == 21 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.0;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 11 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 1 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 3.5;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 50 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 0.5;
-                pose.pose.position.y =init_position_y_take_off + 4.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 40 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 4.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if (flag == 30 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.5;
-                pose.pose.position.y =init_position_y_take_off + 4.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 20 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.0;
-                pose.pose.position.y =init_position_y_take_off + 4.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 10 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 2.5;
-                pose.pose.position.y =init_position_y_take_off + 4.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-            if (flag == 0 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                pose.pose.position.x = init_position_x_take_off + 1.0;
-                pose.pose.position.y =init_position_y_take_off + 4.0;
-                pose.pose.position.z =init_position_z_take_off + ALTITUDE;
-                last_request = ros::Time::now();
-            }
-
-            if (flag == 91 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {   
-                pose.pose.position.x = init_position_x_take_off + 0;
-                pose.pose.position.y =init_position_y_take_off + 0;
-                pose.pose.position.z =init_position_z_take_off + 0.3;
-            }
-            if (flag == 92 && ros::Time::now() - last_request > ros::Duration(8.0))
-            {
-                ROS_INFO("LAND");
-                last_request = ros::Time::now();
-                mavros_msgs::SetMode set_mode;
-                set_mode.request.custom_mode = "AUTO.LAND";
-                if (set_mode_client.call(set_mode) && set_mode.response.mode_sent)
+                if( arming_client.call(arm_cmd) && arm_cmd.response.success)
                 {
-                    ROS_INFO("Auto land sent");
+                    ROS_INFO("Vehicle armed");
                 }
-                flag = 93;
+                last_request = ros::Time::now();
+                start_time = ros::Time::now();
+                flag_init_position = false;         
             }
+        }
+                
+        //2、添加时间判断，使得无人机跳出模式切换循环
+        if(ros::Time::now() - last_request > ros::Duration(8.0))
+        {
+            break;
+            flag = 68;
+        }
+                    
+        //发布期望位置信息
+        pose.pose.position.x =init_position_x_take_off + 0;
+        pose.pose.position.y =init_position_y_take_off + 0;
+        pose.pose.position.z =init_position_z_take_off + ALTITUDE;
+        local_pos_pub.publish(pose);
+        ros::spinOnce();
+        rate.sleep();
+    }       
+    last_request = ros::Time::now();        
 
-            if (flag == 93 && ros::Time::now() - last_request > ros::Duration(1.0))
-            {
-                break;
-                flag = 99; //end of the mission
-            }
-            
+    while(ros::ok())
+    {
+        ROS_INFO("target_X: %f target_Y: %f",pose.pose.position.x,pose.pose.position.y);
+        local_pos_pub.publish(pose);
+        ros::spinOnce();
+        rate.sleep();
+        ROS_WARN("%d",flag);
 
+        // 使用新的函数处理位置设置
+        if(flag >= 0 && flag <= 99 && flag != 92 && flag != 93 && 
+           ros::Time::now() - last_request > ros::Duration(1.0))
+        {
+            setTargetPosition(flag, pose, init_position_x_take_off, 
+                            init_position_y_take_off, init_position_z_take_off);
+            last_request = ros::Time::now();
         }
 
-    
+        if (flag == 92 && ros::Time::now() - last_request > ros::Duration(8.0))
+        {
+            ROS_INFO("LAND");
+            last_request = ros::Time::now();
+            mavros_msgs::SetMode set_mode;
+            set_mode.request.custom_mode = "AUTO.LAND";
+            if (set_mode_client.call(set_mode) && set_mode.response.mode_sent)
+            {
+                ROS_INFO("Auto land sent");
+            }
+            flag = 93;
+        }
+
+        if (flag == 93 && ros::Time::now() - last_request > ros::Duration(1.0))
+        {
+            break;
+            flag = 99; //end of the mission
+        }
+    }
+
     return 0;
 }
