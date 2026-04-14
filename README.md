@@ -40,6 +40,8 @@ Fastlio:github仓库：https://github.com/hku-mars/FAST_LIO
   
   4、run_all.sh:该脚本可以打开所有代码 包括LIO、通信和控制节点，使用前将其赋予chmod +x 权限并设置开机启动
 
+  5、openmv-code：以microPy编写的机器视觉神经网络 使用开发板OpenMV H7，效果不佳，谨慎使用！推荐以OpenCV为对象
+
   
 经验证可以顺利完成2024年电赛题目 100/120；
 
